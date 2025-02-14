@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Валентинка для Софьи</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffebee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .valentine-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 300px;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #e91e63;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #c2185b;
+        }
+
+        .start-button {
+            background-color: #4CAF50;
+            margin-top: 15px;
+        }
+
+        .game-container {
+            display: none;
+            text-align: center;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            color: #e91e63;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .box {
+            width: 80px;
+            height: 80px;
+            background-color: #e91e63;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff0;
+            border-radius: 50%;
+            animation: explode 1s ease-out;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        .kittens {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .kittens img {
+            width: 150px;
+            height: auto;
+            border-radius: 10px;
+            margin: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .clicker-game {
+            text-align: center;
+        }
+
+        #big-heart {
+            font-size: 80px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin: 20px 0;
+        }
+
+        .score-display {
+            font-size: 24px;
+            color: #e91e63;
+            margin: 10px 0;
+        }
+
+        .timer-display {
+            font-size: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="valentine-card">
+        <h1>💖 Дорогая Софья! 💖</h1>
+        <p>Ты делаешь мой мир ярче каждый день!</p>
+        <button class="start-button" onclick="startGameSequence()">Начать путешествие!</button>
+        <p id="final-message" style="display: none; color: #e91e63; font-weight: bold;">
+            Ты прошла все испытания! Спасибо, что ты есть! 😊
+        </p>
+    </div>
+
+    <div id="game-container" class="game-container"></div>
+    
+    <div id="kittens" class="kittens" style="display: none;">
+        <img src="kittens/sofi.webp" alt="Рыжий котик Софи">
+        <img src="kittens/quaan.webp" alt="Чёрный котик Куан">
+        <p>Мы🐾</p>
+    </div>
+
+    <script>
+        const GAMES = ['hearts', 'find', 'clicker'];
+        let currentGameIndex = 0;
+        let gameActive = false;
+
+        function startGameSequence() {
+            currentGameIndex = 0;
+            document.querySelector('.start-button').style.display = 'none';
+            document.getElementById('final-message').style.display = 'none';
+            document.getElementById('kittens').style.display = 'none';
+            startGame(GAMES[currentGameIndex]);
+        }
+
+        function startGame(gameType) {
+            gameActive = true;
+            const container = document.getElementById('game-container');
+            container.style.display = 'block';
+            container.innerHTML = '';
+
+            switch(gameType) {
+                case 'hearts': initHeartsGame(); break;
+                case 'find': initFindGame(); break;
+                case 'clicker': initClickerGame(); break;
+            }
+        }
+
+        function endGame() {
+            gameActive = false;
+            document.getElementById('game-container').innerHTML = '';
+            
+            currentGameIndex++;
+            if(currentGameIndex < GAMES.length) {
+                setTimeout(() => startGame(GAMES[currentGameIndex]), 1000);
+            } else {
+                document.getElementById('final-message').style.display = 'block';
+                document.getElementById('kittens').style.display = 'flex';
+                document.querySelector('.start-button').style.display = 'block';
+                createFireworks();
+            }
+        }
+
+        function initHeartsGame() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = `<p>🍀 Поймай 5 сердечек за 15 секунд!</p>`;
+            
+            let score = 0;
+            let timeLeft = 15;
+            
+            const timer = setInterval(() => {
+                if(--timeLeft <= 0) endGame();
+            }, 1000);
+
+            const heartInterval = setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '❤️';
+                heart.style.left = `${Math.random() * 90}vw`;
+                
+                heart.onclick = () => {
+                    heart.remove();
+                    if(++score >= 5) endGame();
+                };
+
+                container.appendChild(heart);
+            }, 800);
+
+            setTimeout(() => {
+                clearInterval(heartInterval);
+                clearInterval(timer);
+            }, 15000);
+        }
+
+        function initFindGame() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = `<p>🔍 Найди спрятанное сердечко!</p>`;
+            
+            const heartIndex = Math.floor(Math.random() * 3);
+            ['🎁', '🎁', '🎁'].forEach((emoji, i) => {
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.textContent = emoji;
+                
+                box.onclick = () => {
+                    if(i === heartIndex) {
+                        box.innerHTML = '❤️';
+                        box.style.background = '#4CAF50';
+                        setTimeout(endGame, 500);
+                    } else {
+                        box.style.background = '#ff5722';
+                    }
+                };
+                
+                container.appendChild(box);
+            });
+        }
+
+        function initClickerGame() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = `
+                <div style="margin: 20px;">
+                    <p>⏱️ Кликай как можно быстрее!</p>
+                    <div id="big-heart" style="font-size: 80px; cursor: pointer;">❤️</div>
+                    <div style="font-size: 24px; color: #e91e63;">
+                        Счёт: <span id="score">0</span>
+                    </div>
+                </div>
+            `;
+
+            let score = 0;
+            const scoreElement = document.getElementById('score');
+            const heart = document.getElementById('big-heart');
+            
+            const clickHandler = () => {
+                scoreElement.textContent = ++score;
+                heart.style.transform = 'scale(1.2)';
+                setTimeout(() => heart.style.transform = 'scale(1)', 100);
+            };
+
+            heart.addEventListener('click', clickHandler);
+            
+            setTimeout(() => {
+                heart.removeEventListener('click', clickHandler);
+                endGame();
+            }, 10000);
+        }
+
+        function createFireworks() {
+            const fireworksContainer = document.createElement('div');
+            fireworksContainer.className = 'fireworks';
+            
+            for(let i = 0; i < 50; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = `${Math.random() * 100}vw`;
+                firework.style.top = `${Math.random() * 100}vh`;
+                firework.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                fireworksContainer.appendChild(firework);
+            }
+            
+            document.body.appendChild(fireworksContainer);
+            setTimeout(() => fireworksContainer.remove(), 1000);
+        }
+    </script>
+</body>
+</html>
